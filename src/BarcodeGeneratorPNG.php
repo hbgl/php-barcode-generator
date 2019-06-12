@@ -18,7 +18,7 @@ class BarcodeGeneratorPNG extends BarcodeGenerator
      * @return string image data or false in case of error.
      * @public
      */
-    public function getBarcode($code, $type, $widthFactor = 2, $totalHeight = 30, $color = array(0, 0, 0))
+    public function getBarcode($code, $type, $widthFactor = 2, $totalHeight = 30, $color = array(0, 0, 0), $background = array(0, 0, 0))
     {
         $barcodeData = $this->getBarcodeData($code, $type);
 
@@ -30,14 +30,26 @@ class BarcodeGeneratorPNG extends BarcodeGenerator
             // GD library
             $imagick = false;
             $png = imagecreate($width, $height);
-            $colorBackground = imagecolorallocate($png, 255, 255, 255);
-            imagecolortransparent($png, $colorBackground);
+            $colorBackground = null;
+            if ($background === null) {
+                $colorBackground = imagecolorallocate($png, 255, 255, 255);
+                imagecolortransparent($png, $colorBackground);
+            } else {
+                $colorBackground = imagecolorallocate($png, $background[0], $background[1], $background[2]);
+            }
+            
             $colorForeground = imagecolorallocate($png, $color[0], $color[1], $color[2]);
         } elseif (extension_loaded('imagick')) {
             $imagick = true;
             $colorForeground = new \imagickpixel('rgb(' . $color[0] . ',' . $color[1] . ',' . $color[2] . ')');
+            $colorBackground = null;
+            if ($background === null) {
+                $colorBackground = 'none';
+            } else {
+                $colorBackground = new \imagickpixel('rgb(' . $background[0] . ',' . $background[1] . ',' . $background[2] . ')');
+            }
             $png = new \Imagick();
-            $png->newImage($width, $height, 'none', 'png');
+            $png->newImage($width, $height, $colorBackground, 'png');
             $imageMagickObject = new \imagickdraw();
             $imageMagickObject->setFillColor($colorForeground);
         } else {

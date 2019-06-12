@@ -16,6 +16,17 @@ class BarcodeTest extends PHPUnit_Framework_TestCase
     /**
      * @test
      */
+    public function png_barcode_generator_can_generate_code_128_barcode_with_white_background()
+    {
+        $generator = new Picqer\Barcode\BarcodeGeneratorPNG();
+        $generated = $generator->getBarcode('081231723897', $generator::TYPE_CODE_128, 2, 30, [0, 0, 0], [255, 255, 255]);
+
+        $this->assertEquals('PNG', substr($generated, 1, 3));
+    }
+
+    /**
+     * @test
+     */
     public function svg_barcode_generator_can_generate_ean_13_barcode()
     {
         $generator = new Picqer\Barcode\BarcodeGeneratorSVG();
